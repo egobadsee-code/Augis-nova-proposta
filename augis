@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AugiScale — Nova Proposta Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{--black:#050505;--deep:#0a0a0a;--panel:#111111;--border:#1e1e1e;--mid:#1a1a1a;--gray:#b8b8b8;--light:#e8e8e8;--white:#f5f5f5;--red:#d32f2f;--red-dim:#7a1010;--accent:#ff3333;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-snap-type:y mandatory;scroll-behavior:smooth;}
+body{background:var(--black);color:var(--white);font-family:'Rajdhani',sans-serif;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.35;}
+section{scroll-snap-align:start;min-height:100vh;width:100%;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;}
+.grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(211,47,47,.032) 1px,transparent 1px),linear-gradient(90deg,rgba(211,47,47,.032) 1px,transparent 1px);background-size:64px 64px;pointer-events:none;}
+.scanlines::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.06) 2px,rgba(0,0,0,.06) 4px);pointer-events:none;z-index:1;}
+#nav{position:fixed;right:22px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:10px;z-index:1000;}
+.dot{width:6px;height:6px;border:1px solid var(--gray);border-radius:50%;cursor:pointer;background:transparent;transition:all .3s;}
+.dot.active,.dot:hover{background:var(--red);border-color:var(--red);box-shadow:0 0 8px var(--red);}
+.si{position:relative;z-index:2;width:100%;max-width:1280px;margin:0 auto;padding:0 clamp(28px,6vw,90px);}
+.chip{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.3em;color:var(--red);margin-bottom:14px;}
+.chip::before{content:'// ';}
+.stitle{font-family:'Bebas Neue',sans-serif;font-size:clamp(38px,5.8vw,76px);letter-spacing:.04em;line-height:.95;color:var(--white);margin-bottom:30px;}
+.stitle .r{color:var(--red);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(26px);}to{opacity:1;transform:translateY(0);}}
+.fa{animation:fadeUp .7s ease both;}.fb{animation:fadeUp .7s .1s ease both;}.fc{animation:fadeUp .7s .2s ease both;}.fd{animation:fadeUp .7s .3s ease both;}
+.corner{position:absolute;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--red-dim);letter-spacing:.14em;}
+.corner.tl{top:26px;left:34px;}.corner.tr{top:26px;right:34px;}
+.corner.bl{bottom:26px;left:34px;}.corner.br{bottom:26px;right:34px;}
+
+/* ── CAPA ── */
+#s1{background:var(--black);}
+.capa-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:100vh;}
+@media(max-width:760px){.capa-grid{grid-template-columns:1fr;}}
+.capa-left{display:flex;flex-direction:column;justify-content:center;padding:60px clamp(28px,5vw,80px);border-right:1px solid var(--border);position:relative;}
+.capa-right{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:60px clamp(28px,5vw,80px);background:rgba(211,47,47,.03);}
+.pro-badge{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.35em;color:var(--red);margin-bottom:20px;}
+.c-logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,8vw,108px);letter-spacing:.06em;line-height:.88;background:linear-gradient(170deg,var(--white) 30%,#555 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.c-sub{font-size:clamp(10px,1.2vw,13px);font-weight:300;letter-spacing:.38em;color:var(--gray);text-transform:uppercase;margin-top:10px;margin-bottom:28px;}
+.c-rule{width:60px;height:2px;background:var(--red);margin-bottom:22px;box-shadow:0 0 14px var(--red);}
+.c-desc{font-size:clamp(13px,1.6vw,16px);font-weight:300;color:var(--light);line-height:1.75;max-width:380px;}
+.c-desc strong{color:var(--white);}
+.price-block{background:var(--panel);border-top:3px solid var(--red);padding:30px 28px;width:100%;margin-bottom:14px;}
+.price-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.28em;color:var(--red);margin-bottom:12px;}
+.price-main{font-family:'Bebas Neue',sans-serif;font-size:clamp(56px,7vw,90px);color:var(--accent);line-height:.95;}
+.price-plus{font-family:'Bebas Neue',sans-serif;font-size:clamp(26px,3.5vw,44px);color:var(--gray);line-height:1;margin-top:4px;}
+.price-period{font-size:10px;color:var(--gray);letter-spacing:.18em;margin-top:8px;}
+.req-pill{display:inline-block;background:rgba(211,47,47,.12);border:1px solid var(--red-dim);font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:.18em;color:var(--accent);padding:5px 13px;margin-bottom:14px;}
+.avail{background:var(--mid);padding:16px 18px;width:100%;}
+.avail-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.22em;color:var(--gray);margin-bottom:6px;}
+.avail-txt{font-size:12px;font-weight:300;color:var(--light);line-height:1.55;}
+.avail-txt strong{color:var(--white);}
+
+/* ── SEÇÕES INTERNAS ── */
+.dw{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:14px;}
+@media(max-width:760px){.dw{grid-template-columns:1fr;}}
+.dm{display:flex;flex-direction:column;gap:2px;}
+.db{background:var(--panel);padding:20px 22px;}
+.db-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.25em;color:var(--red);margin-bottom:8px;}
+.db-title{font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--white);margin-bottom:6px;}
+.db-body{font-size:12px;font-weight:300;color:var(--gray);line-height:1.7;}
+.db-body strong{color:var(--light);}
+.db.ac{background:rgba(211,47,47,.07);border-left:3px solid var(--red);}
+.da{display:flex;flex-direction:column;gap:2px;}
+.dinc{background:var(--panel);padding:24px;flex:1;}
+.dinc-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.3em;color:var(--red);margin-bottom:14px;}
+.ilist{display:flex;flex-direction:column;gap:10px;}
+.irow{display:flex;gap:10px;align-items:flex-start;}
+.idot{color:var(--red);font-size:9px;margin-top:3px;flex-shrink:0;}
+.itxt{font-size:12px;font-weight:300;color:var(--light);line-height:1.5;}
+.itxt strong{color:var(--white);font-weight:700;}
+.dnote{background:rgba(211,47,47,.06);border:1px solid var(--red-dim);padding:16px 20px;}
+.dnote p{font-size:12px;font-weight:300;color:var(--light);line-height:1.65;}
+.dnote strong{color:var(--white);}
+
+/* ── REQUISITOS ── */
+.req-block{background:rgba(211,47,47,.06);border:1px solid var(--red-dim);padding:20px 22px;}
+.req-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.3em;color:var(--accent);margin-bottom:14px;}
+.req-list{display:flex;flex-direction:column;gap:11px;}
+.req-row{display:flex;gap:13px;align-items:flex-start;}
+.req-num{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--red);line-height:1;flex-shrink:0;width:20px;}
+.req-txt{font-size:12px;font-weight:300;color:var(--light);line-height:1.5;}
+.req-txt strong{color:var(--white);font-weight:700;}
+.req-txt em{color:var(--gray);font-style:normal;font-size:11px;}
+
+/* ── TIMELINE / FLUXO ── */
+#s3{background:var(--deep);}
+.flow{display:flex;flex-direction:column;gap:2px;margin-top:14px;}
+.fstep{display:grid;grid-template-columns:42px 1fr;gap:0;background:var(--panel);}
+.fnum{background:var(--red);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff;writing-mode:vertical-rl;padding:18px 12px;letter-spacing:.05em;}
+.fbody{padding:18px 22px;}
+.fstep-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.22em;color:var(--red);margin-bottom:5px;}
+.fstep-title{font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--white);margin-bottom:4px;}
+.fstep-desc{font-size:12px;font-weight:300;color:var(--gray);line-height:1.6;}
+.fstep-desc strong{color:var(--light);}
+
+/* ── ENTREGÁVEIS ── */
+#s4{background:var(--black);}
+.ent-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:14px;}
+@media(max-width:760px){.ent-grid{grid-template-columns:1fr;}}
+.ebox{background:var(--panel);padding:22px 20px;display:flex;flex-direction:column;gap:9px;}
+.ebox.hot{background:rgba(211,47,47,.07);border-top:2px solid var(--red);}
+.ebox-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.22em;color:var(--red);}
+.ebox-title{font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.07em;color:var(--white);}
+.ebox-body{font-size:11px;font-weight:300;color:var(--gray);line-height:1.65;}
+.ebox-body strong{color:var(--light);}
+
+/* ── CTA FINAL ── */
+#s5{background:var(--black);}
+.rings{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
+.ring{position:absolute;border-radius:50%;border:1px solid;top:50%;left:50%;transform:translate(-50%,-50%);}
+.ring:nth-child(1){width:680px;height:680px;border-color:rgba(211,47,47,.04);}
+.ring:nth-child(2){width:440px;height:440px;border-color:rgba(211,47,47,.09);}
+.ring:nth-child(3){width:210px;height:210px;border-color:rgba(211,47,47,.18);}
+.cta-wrap{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:2px;align-items:center;}
+@media(max-width:760px){.cta-wrap{grid-template-columns:1fr;}}
+.cta-left{padding-right:40px;}
+.cta-eye{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.35em;color:var(--red);margin-bottom:18px;}
+.cta-h{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,8vw,110px);letter-spacing:.04em;line-height:.92;color:var(--white);margin-bottom:14px;}
+.cta-h .r{color:var(--red);text-shadow:0 0 40px rgba(211,47,47,.35);}
+.cta-d{font-size:clamp(12px,1.4vw,14px);font-weight:300;color:var(--gray);letter-spacing:.12em;text-transform:uppercase;line-height:1.7;}
+.cta-right{display:flex;flex-direction:column;gap:2px;}
+.sum-row{background:var(--panel);padding:18px 22px;display:flex;justify-content:space-between;align-items:center;}
+.sum-row.hi{background:var(--red);}
+.sum-key{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.2em;color:var(--gray);text-transform:uppercase;}
+.sum-row.hi .sum-key{color:rgba(255,255,255,.7);}
+.sum-val{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--white);line-height:1;}
+.sum-row.hi .sum-val{color:#fff;font-size:32px;}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="dot active" onclick="goto(0)"></div>
+  <div class="dot" onclick="goto(1)"></div>
+  <div class="dot" onclick="goto(2)"></div>
+  <div class="dot" onclick="goto(3)"></div>
+  <div class="dot" onclick="goto(4)"></div>
+</nav>
+
+<!-- S1 CAPA -->
+<section id="s1" class="scanlines">
+  <div class="grid-bg"></div>
+  <span class="corner tl">AUGISCALE // PROPOSTA COMERCIAL</span>
+  <span class="corner tr">PLANO PRO — NOVA PROPOSTA</span>
+  <span class="corner bl">CONFIDENCIAL — USO INTERNO</span>
+  <span class="corner br">VERSÃO REVISADA 2025</span>
+  <div class="capa-grid">
+    <div class="capa-left">
+      <div class="pro-badge fa">// AUGISCALE — PLANO PRO</div>
+      <div class="c-logo fb">NOVA<br>PROPOSTA</div>
+      <div class="c-sub fb">Plano Pro — Revisão de Valor</div>
+      <div class="c-rule fc"></div>
+      <p class="c-desc fc">Automação comercial completa para clínicas odontológicas qualificadas — <strong>do lead ao comparecimento, sem intervenção manual.</strong></p>
+    </div>
+    <div class="capa-right">
+      <div class="price-block fa">
+        <div class="price-lbl">// NOVO VALOR — PLANO PRO</div>
+        <div class="price-main">R$1.200</div>
+        <div class="price-plus">+ 10% sobre fechamentos</div>
+        <div class="price-period">MENSALIDADE FIXA + COMISSÃO POR RESULTADO</div>
+      </div>
+      <span class="req-pill fb">⚠ SUJEITO A REQUISITOS DE QUALIFICAÇÃO</span>
+      <div class="avail fc">
+        <div class="avail-lbl">// DISPONIBILIDADE</div>
+        <div class="avail-txt">Disponível <strong>após 30 dias de planejamento</strong> — período de mapeamento do funil, configuração das automações e treinamento dos scripts antes do lançamento.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S2 O QUE COMPÕE + REQUISITOS -->
+<section id="s2">
+  <div class="grid-bg"></div>
+  <div class="si">
+    <div class="chip">composição do plano</div>
+    <h2 class="stitle">O QUE ESTÁ<br><span class="r">INCLUSO</span></h2>
+    <div class="dw">
+      <div class="dm">
+        <div class="db ac">
+          <div class="db-lbl">// CAPTAÇÃO — BASE DO PLANO</div>
+          <div class="db-title">Meta Ads + Google Ads + Design</div>
+          <div class="db-body">Gestão completa de campanhas no Facebook, Instagram e Google. Criativos produzidos e rotacionados para evitar fadiga. <strong>Lead direcionado direto ao WhatsApp da clínica</strong>, ticket definido em acordo prévio.</div>
+        </div>
+        <div class="db">
+          <div class="db-lbl">// AUTOMAÇÃO WHATSAPP</div>
+          <div class="db-title">Sequência Completa de Agendamento</div>
+          <div class="db-body">Boas-vindas → qualificação → convite para avaliação → confirmação de presença. Copy especializado por ticket odontológico. <strong>Nenhuma etapa depende de resposta manual.</strong></div>
+        </div>
+        <div class="db">
+          <div class="db-lbl">// SUPORTE COMERCIAL ATIVO</div>
+          <div class="db-title">A Automação Executa, o Suporte Garante</div>
+          <div class="db-body">Acompanhamento ativo de todas as conversas — intervenção quando necessário, garantia de qualidade no atendimento e <strong>scripts de manejo de objeções</strong> por ticket.</div>
+        </div>
+        <div class="db">
+          <div class="db-lbl">// PÓS-AVALIAÇÃO + REMARKETING + REATIVAÇÃO</div>
+          <div class="db-title">Nenhum Lead Desperdiçado</div>
+          <div class="db-body">Paciente que saiu sem fechar: acompanhamento automático. Lead que não respondeu: remarketing. Base inativa: reativação segmentada. <strong>Receita que antes era perdida,</strong> recuperada.</div>
+        </div>
+      </div>
+      <div class="da">
+        <div class="dinc">
+          <div class="dinc-lbl">// RESUMO DO QUE INCLUI</div>
+          <div class="ilist">
+            <div class="irow"><span class="idot">▸</span><span class="itxt"><strong>Meta Ads</strong> — gestão completa com funil estruturado</span></div>
+            <div class="irow"><span class="idot">▸</span><span class="itxt"><strong>Google Ads</strong> — pesquisa, display e manutenção de marca</span></div>
+            <div class="irow"><span class="idot">▸</span><span class="itxt"><strong>Design de criativos</strong> com rotatividade anti-fadiga</span></div>
+            <div class="irow"><span class="idot" style="color:var(--accent);">▸</span><span class="itxt" style="color:var(--accent);"><strong>Automação WhatsApp</strong> — sequência de agendamento completa</span></div>
+            <div class="irow"><span class="idot" style="color:var(--accent);">▸</span><span class="itxt" style="color:var(--accent);"><strong>Suporte comercial ativo</strong> em todas as conversas</span></div>
+            <div class="irow"><span class="idot">▸</span><span class="itxt"><strong>Pós-avaliação</strong> — acompanhamento de quem não fechou</span></div>
+            <div class="irow"><span class="idot">▸</span><span class="itxt"><strong>Remarketing</strong> — reengajamento de leads inativos</span></div>
+            <div class="irow"><span class="idot">▸</span><span class="itxt"><strong>Reativação</strong> — base antiga com mensagens segmentadas</span></div>
+            <div class="irow"><span class="idot">▸</span><span class="itxt"><strong>Scripts</strong> de follow-up e manejo de objeções por ticket</span></div>
+            <div class="irow"><span class="idot">▸</span><span class="itxt"><strong>Relatório mensal</strong> de conversão + ajuste de estratégia</span></div>
+          </div>
+        </div>
+        <div class="req-block">
+          <div class="req-lbl">⚠ REQUISITOS DE QUALIFICAÇÃO</div>
+          <div class="req-list">
+            <div class="req-row"><span class="req-num">①</span><span class="req-txt"><strong>Trabalhar com boleto</strong> <em>— indicamos parceiros para quem ainda não usa</em></span></div>
+            <div class="req-row"><span class="req-num">②</span><span class="req-txt"><strong>Mínimo 4 dias de atendimento</strong> por semana</span></div>
+            <div class="req-row"><span class="req-num">③</span><span class="req-txt"><strong>A partir de R$600/mês em tráfego pago</strong> <em>— vai direto para as plataformas, não para a AugiScale</em></span></div>
+            <div class="req-row"><span class="req-num">④</span><span class="req-txt"><strong>Operar com prótese, implante ou protocolo</strong></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S3 FLUXO DE OPERAÇÃO -->
+<section id="s3">
+  <div class="grid-bg"></div>
+  <div class="si">
+    <div class="chip">como opera na prática</div>
+    <h2 class="stitle">O FLUXO<br><span class="r">COMPLETO</span></h2>
+    <div class="dw">
+      <div class="flow fa">
+        <div class="fstep">
+          <div class="fnum">01</div>
+          <div class="fbody">
+            <div class="fstep-lbl">// CAPTAÇÃO</div>
+            <div class="fstep-title">Anúncio → WhatsApp</div>
+            <div class="fstep-desc">Lead gerado pelo Meta ou Google é direcionado ao WhatsApp da clínica. <strong>Mensagem de boas-vindas automática</strong> ativa em segundos — zero tempo de espera.</div>
+          </div>
+        </div>
+        <div class="fstep fb">
+          <div class="fnum">02</div>
+          <div class="fbody">
+            <div class="fstep-lbl">// QUALIFICAÇÃO</div>
+            <div class="fstep-title">Filtro Automático de Intenção</div>
+            <div class="fstep-desc">Sequência de perguntas identifica o ticket de interesse, urgência e disponibilidade. <strong>Leads desqualificados são descartados automaticamente</strong> — o time só vê quem tem real intenção.</div>
+          </div>
+        </div>
+        <div class="fstep fc">
+          <div class="fnum">03</div>
+          <div class="fbody">
+            <div class="fstep-lbl">// AGENDAMENTO</div>
+            <div class="fstep-title">Convite + Confirmação Automatizados</div>
+            <div class="fstep-desc">Convite para avaliação enviado no momento certo. <strong>Confirmação de presença D-1 e D-0</strong> reduz faltas e maximiza comparecimento.</div>
+          </div>
+        </div>
+      </div>
+      <div class="flow">
+        <div class="fstep fa">
+          <div class="fnum">04</div>
+          <div class="fbody">
+            <div class="fstep-lbl">// PÓS-AVALIAÇÃO</div>
+            <div class="fstep-title">Acompanhamento de Quem Não Fechou</div>
+            <div class="fstep-desc">Paciente que foi à avaliação mas não fechou entra numa <strong>sequência de follow-up com scripts de objeção</strong> específicos para o tratamento avaliado.</div>
+          </div>
+        </div>
+        <div class="fstep fb">
+          <div class="fnum">05</div>
+          <div class="fbody">
+            <div class="fstep-lbl">// REMARKETING</div>
+            <div class="fstep-title">Reengajamento de Leads Inativos</div>
+            <div class="fstep-desc">Leads que não responderam ou sumiram recebem <strong>mensagens de remarketing segmentadas por comportamento</strong> — com timing calculado para não gerar pressão.</div>
+          </div>
+        </div>
+        <div class="fstep fc">
+          <div class="fnum">06</div>
+          <div class="fbody">
+            <div class="fstep-lbl">// RELATÓRIO</div>
+            <div class="fstep-title">Relatório Mensal + Ajuste de Estratégia</div>
+            <div class="fstep-desc">Todo mês: taxa de agendamento, comparecimento e conversão. <strong>Estratégia ajustada com base em dados reais</strong> — não em achismo.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S4 ENTREGÁVEIS POR CANAL -->
+<section id="s4">
+  <div class="grid-bg"></div>
+  <div class="si">
+    <div class="chip">entregáveis por canal</div>
+    <h2 class="stitle">CADA CANAL.<br><span class="r">SEU PAPEL.</span></h2>
+    <div class="ent-grid">
+      <div class="ebox hot fa">
+        <div class="ebox-lbl">// META ADS</div>
+        <div class="ebox-title">Facebook + Instagram</div>
+        <div class="ebox-body">Funil estruturado para <strong>prótese total, flexível e parcial</strong>. Segmentação de público por faixa etária, renda e comportamento. Criativos rotacionados com controle de fadiga. CPL monitorado mensalmente.</div>
+      </div>
+      <div class="ebox hot fb">
+        <div class="ebox-lbl">// GOOGLE ADS</div>
+        <div class="ebox-title">Pesquisa + Display + Marca</div>
+        <div class="ebox-body">Campanhas de pesquisa para <strong>implante, protocolo e marca</strong>. Palavras-chave configuradas por intenção de compra. Extensões de chamada, localização e avaliação ativas.</div>
+      </div>
+      <div class="ebox hot fc">
+        <div class="ebox-lbl">// WHATSAPP</div>
+        <div class="ebox-title">Automação Completa</div>
+        <div class="ebox-body">Boas-vindas, qualificação, agendamento, confirmação, pós-avaliação, remarketing e reativação. <strong>Suporte comercial ativo</strong> em paralelo. Scripts por ticket validados antes do lançamento.</div>
+      </div>
+      <div class="ebox fd">
+        <div class="ebox-lbl">// DESIGN</div>
+        <div class="ebox-title">Criativos para Campanhas Ativas</div>
+        <div class="ebox-body">Peças visuais produzidas e atualizadas com identidade da clínica. <strong>Rotatividade programada</strong> para manter CPL estável. Ticket e produto definidos em acordo prévio.</div>
+      </div>
+      <div class="ebox fa">
+        <div class="ebox-lbl">// SCRIPTS + OBJEÇÕES</div>
+        <div class="ebox-title">Copy por Ticket Odontológico</div>
+        <div class="ebox-body">Scripts de follow-up e manejo de objeções específicos para cada tratamento. <strong>Linguagem empática, sem pressão</strong> — com foco em comparecimento e fechamento.</div>
+      </div>
+      <div class="ebox fb">
+        <div class="ebox-lbl">// RELATÓRIO</div>
+        <div class="ebox-title">Dados + Ajuste Mensal</div>
+        <div class="ebox-body">Relatório mensal com <strong>taxa de agendamento, comparecimento e conversão</strong>. Análise de onde os leads estão sendo perdidos. Estratégia ajustada a cada ciclo.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S5 CTA FINAL -->
+<section id="s5" class="scanlines">
+  <div class="grid-bg"></div>
+  <div class="rings"><div class="ring"></div><div class="ring"></div><div class="ring"></div></div>
+  <div class="si">
+    <div class="cta-wrap">
+      <div class="cta-left">
+        <div class="cta-eye">// NOVA PROPOSTA — PLANO PRO</div>
+        <div class="cta-h">R$1.200<br>+ <span class="r">10%</span></div>
+        <p class="cta-d">Mensalidade fixa + comissão sobre fechamentos.<br>O resultado da clínica é o resultado da AugiScale.</p>
+      </div>
+      <div class="cta-right">
+        <div class="sum-row hi">
+          <span class="sum-key">// MENSALIDADE FIXA</span>
+          <span class="sum-val">R$1.200 / mês</span>
+        </div>
+        <div class="sum-row">
+          <span class="sum-key">// COMISSÃO</span>
+          <span class="sum-val">10% sobre fechamentos</span>
+        </div>
+        <div class="sum-row">
+          <span class="sum-key">// TRÁFEGO PAGO</span>
+          <span class="sum-val">R$600 mín. (plataformas)</span>
+        </div>
+        <div class="sum-row">
+          <span class="sum-key">// DISPONIBILIDADE</span>
+          <span class="sum-val">Após 30 dias de planej.</span>
+        </div>
+        <div class="sum-row">
+          <span class="sum-key">// REQUISITOS</span>
+          <span class="sum-val">4 critérios — ver slide 2</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+const secs=document.querySelectorAll('section'),dots=document.querySelectorAll('.dot');
+function goto(i){secs[i].scrollIntoView({behavior:'smooth'});}
+const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){const i=Array.from(secs).indexOf(x.target);dots.forEach((d,j)=>d.classList.toggle('active',i===j));}});},{threshold:.5});
+secs.forEach(s=>obs.observe(s));
+</script>
+</body>
+</html>
